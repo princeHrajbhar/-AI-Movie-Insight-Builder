@@ -8,6 +8,7 @@ const nextConfig = {
       'image.tmdb.org',
       'themoviedb.org'
     ],
+    
     // Optional: Add remote patterns for more control
     remotePatterns: [
       {

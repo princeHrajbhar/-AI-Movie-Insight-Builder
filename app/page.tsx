@@ -46,32 +46,32 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const analyzeMovie = async () => {
-    if (!movieId.trim()) {
-      setError('Please enter a movie ID');
-      return;
-    }
+const analyzeMovie = async () => {
+  if (!movieId.trim()) {
+    setError('Please enter a movie ID');
+    return;
+  }
 
-    setLoading(true);
-    setError('');
+  setLoading(true);
+  setError('');
+  
+  try {
+    // Use the full external API URL
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movie?id=${movieId}`);
     
-    try {
-   const response = await fetch(
-  `${process.env.NEXT_PUBLIC_API_URL}/api/movie?id=${movieId}`
-);
-      if (!response.ok) {
-        throw new Error('Failed to fetch movie data');
-      }
-      
-      const data = await response.json();
-      setMovieData(data);
-    } catch (err) {
-      setError('Failed to analyze movie. Please check the ID and try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error('Failed to fetch movie data');
     }
-  };
+    
+    const data = await response.json();
+    setMovieData(data);
+  } catch (err) {
+    setError('Failed to analyze movie. Please check the ID and try again.');
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
