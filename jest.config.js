@@ -1,9 +1,11 @@
-/** @type {import('jest').Config} */
 module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/$1",
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  moduleFileExtensions: ['ts', 'js'],
+  testMatch: ['**/tests/**/*.test.(ts|js)'],
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.json',
+    },
   },
-  testTimeout: 60000,
 };

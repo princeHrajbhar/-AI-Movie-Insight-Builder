@@ -56,8 +56,9 @@ export default function Home() {
     setError('');
     
     try {
-      const response = await fetch(`/api/movie-by-id?id=${movieId}`);
-      
+   const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/api/movie?id=${movieId}`
+);
       if (!response.ok) {
         throw new Error('Failed to fetch movie data');
       }
