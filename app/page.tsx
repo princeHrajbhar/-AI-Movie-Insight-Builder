@@ -57,7 +57,7 @@ const analyzeMovie = async () => {
   
   try {
     // Use the full external API URL
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movie?id=${movieId}`);
+    const response = await fetch(`http://13.62.47.101:3000/api/movie?id=${movieId}`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch movie data');
