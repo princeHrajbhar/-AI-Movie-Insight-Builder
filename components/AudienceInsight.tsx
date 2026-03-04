@@ -1,6 +1,14 @@
 // components/AudienceInsight.tsx
-import { FC } from 'react';
-import { ThumbsUp, ThumbsDown, MinusCircle, TrendingUp, Heart, AlertCircle, CheckCircle, Brain } from 'lucide-react';
+import { 
+  TrendingUp, 
+  ThumbsUp, 
+  ThumbsDown, 
+  Minus, 
+  Star, 
+  Zap,
+  BarChart3,
+  PieChart
+} from 'lucide-react';
 
 interface AudienceInsightProps {
   insight: {
@@ -17,149 +25,136 @@ interface AudienceInsightProps {
   };
 }
 
-const AudienceInsight: FC<AudienceInsightProps> = ({ insight }) => {
-  const getSentimentColor = () => {
-    switch (insight.overallSentiment) {
+export default function AudienceInsight({ insight }: AudienceInsightProps) {
+  const getSentimentColor = (sentiment: string) => {
+    switch (sentiment.toLowerCase()) {
       case 'positive':
-        return 'text-green-400';
-      case 'neutral':
-        return 'text-yellow-400';
+        return 'text-green-400 bg-green-500/10 border-green-500/30';
       case 'negative':
-        return 'text-red-400';
+        return 'text-red-400 bg-red-500/10 border-red-500/30';
       default:
-        return 'text-gray-400';
-    }
-  };
-
-  const getSentimentIcon = () => {
-    switch (insight.overallSentiment) {
-      case 'positive':
-        return <ThumbsUp className="w-6 h-6" />;
-      case 'neutral':
-        return <MinusCircle className="w-6 h-6" />;
-      case 'negative':
-        return <ThumbsDown className="w-6 h-6" />;
-      default:
-        return null;
+        return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30';
     }
   };
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl border border-gray-700 p-6 shadow-2xl">
-      <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-        <Brain className="w-6 h-6 text-purple-400" />
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 shadow-xl">
+      <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+        <TrendingUp className="text-purple-400" />
         Audience Insights
-      </h3>
+      </h2>
 
       {/* Sentiment Overview */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
             <span className="text-gray-400">Overall Sentiment</span>
-            <div className={`flex items-center gap-2 ${getSentimentColor()}`}>
-              {getSentimentIcon()}
-              <span className="font-semibold capitalize">{insight.overallSentiment}</span>
-            </div>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getSentimentColor(insight.overallSentiment)}`}>
+              {insight.overallSentiment}
+            </span>
           </div>
           
-          {/* Sentiment Score Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Sentiment Score</span>
-              <span className="text-white font-semibold">{(insight.score * 100).toFixed(0)}%</span>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Emotional Tone</span>
+            <span className="text-white font-medium">{insight.emotionalTone}</span>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Audience Score</span>
+            <div className="flex items-center gap-2">
+              <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  style={{ width: `${insight.score}%` }}
+                ></div>
+              </div>
+              <span className="text-white font-medium">{insight.score}%</span>
             </div>
-            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-green-400 to-green-500"
-                style={{ width: `${insight.score * 100}%` }}
-              />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Average Rating</span>
+            <div className="flex items-center gap-1">
+              <Star className="text-yellow-400 fill-yellow-400" size={18} />
+              <span className="text-white font-medium">{insight.averageUserRating.toFixed(1)}/10</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-400">Audience Rating</span>
-            <div className="flex items-center gap-2 text-yellow-400">
-              <TrendingUp className="w-5 h-5" />
-              <span className="font-semibold">{insight.averageUserRating}/10</span>
+        {/* Sentiment Distribution */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+            <PieChart size={16} />
+            Sentiment Distribution
+          </h3>
+          
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <ThumbsUp size={16} className="text-green-400" />
+              <span className="text-sm text-gray-300">Positive</span>
+              <span className="ml-auto text-white font-medium">{insight.positivePercentage}%</span>
+            </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-green-500" style={{ width: `${insight.positivePercentage}%` }}></div>
             </div>
           </div>
 
-          {/* Sentiment Distribution */}
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-green-400">Positive</span>
-                <span className="text-white">{insight.positivePercentage}%</span>
-              </div>
-              <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-green-400" style={{ width: `${insight.positivePercentage}%` }} />
-              </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Minus size={16} className="text-yellow-400" />
+              <span className="text-sm text-gray-300">Neutral</span>
+              <span className="ml-auto text-white font-medium">{insight.neutralPercentage}%</span>
             </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-yellow-400">Neutral</span>
-                <span className="text-white">{insight.neutralPercentage}%</span>
-              </div>
-              <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-yellow-400" style={{ width: `${insight.neutralPercentage}%` }} />
-              </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-yellow-500" style={{ width: `${insight.neutralPercentage}%` }}></div>
             </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-red-400">Negative</span>
-                <span className="text-white">{insight.negativePercentage}%</span>
-              </div>
-              <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-red-400" style={{ width: `${insight.negativePercentage}%` }} />
-              </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <ThumbsDown size={16} className="text-red-400" />
+              <span className="text-sm text-gray-300">Negative</span>
+              <span className="ml-auto text-white font-medium">{insight.negativePercentage}%</span>
+            </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-red-500" style={{ width: `${insight.negativePercentage}%` }}></div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Summary */}
-      <div className="mb-8 p-4 bg-purple-900/20 rounded-xl border border-purple-500/20">
-        <p className="text-gray-300 italic leading-relaxed">&ldquo;{insight.summary}&rdquo;</p>
+      <div className="mb-8 p-4 bg-gray-900/50 rounded-lg">
+        <p className="text-gray-300 leading-relaxed">{insight.summary}</p>
       </div>
 
-      {/* Emotional Tone */}
-      <div className="mb-8 flex items-start gap-3 p-4 bg-gray-900/30 rounded-xl">
-        <Heart className="w-5 h-5 text-pink-400 flex-shrink-0 mt-1" />
-        <p className="text-gray-300">
-          <span className="font-semibold text-white">Emotional Tone: </span>
-          {insight.emotionalTone}
-        </p>
-      </div>
-
-      {/* Strengths and Weaknesses */}
+      {/* Strengths & Weaknesses */}
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-3">
-          <h4 className="font-semibold text-green-400 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5" />
+        <div>
+          <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <ThumbsUp size={18} className="text-green-400" />
             Strengths
-          </h4>
+          </h3>
           <ul className="space-y-2">
             {insight.strengths.map((strength, index) => (
-              <li key={index} className="flex items-start gap-2 text-gray-300">
-                <span className="text-green-400 text-lg leading-5">•</span>
-                {strength}
+              <li key={`strength-${index}`} className="flex items-start gap-2 text-gray-300">
+                <span className="text-green-400 mt-1">•</span>
+                <span>{strength}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="space-y-3">
-          <h4 className="font-semibold text-red-400 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5" />
+        <div>
+          <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <ThumbsDown size={18} className="text-red-400" />
             Weaknesses
-          </h4>
+          </h3>
           <ul className="space-y-2">
             {insight.weaknesses.map((weakness, index) => (
-              <li key={index} className="flex items-start gap-2 text-gray-300">
-                <span className="text-red-400 text-lg leading-5">•</span>
-                {weakness}
+              <li key={`weakness-${index}`} className="flex items-start gap-2 text-gray-300">
+                <span className="text-red-400 mt-1">•</span>
+                <span>{weakness}</span>
               </li>
             ))}
           </ul>
@@ -167,6 +162,4 @@ const AudienceInsight: FC<AudienceInsightProps> = ({ insight }) => {
       </div>
     </div>
   );
-};
-
-export default AudienceInsight;
+}

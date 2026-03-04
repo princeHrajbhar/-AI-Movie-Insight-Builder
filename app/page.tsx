@@ -41,38 +41,43 @@ interface MovieData {
 }
 
 export default function Home() {
-  const [movieId, setMovieId] = useState('');
+  const [searchType, setSearchType] = useState<'name' | 'id'>('name');
+  const [searchValue, setSearchValue] = useState('');
   const [movieData, setMovieData] = useState<MovieData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-// In app/page.tsx, update the analyzeMovie function
-const analyzeMovie = async () => {
-  if (!movieId.trim()) {
-    setError('Please enter a movie ID');
-    return;
-  }
-
-  setLoading(true);
-  setError('');
-  
-  try {
-    // Use the proxy instead of direct API call
-    const response = await fetch(`/api/movie-proxy?id=${movieId}`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch movie data');
+  const analyzeMovie = async () => {
+    if (!searchValue.trim()) {
+      setError(searchType === 'name' ? 'Please enter a movie name' : 'Please enter a movie ID');
+      return;
     }
+
+    setLoading(true);
+    setError('');
+    setMovieData(null);
     
-    const data = await response.json();
-    setMovieData(data);
-  } catch (err) {
-    setError('Failed to analyze movie. Please check the ID and try again.');
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const endpoint = searchType === 'name' 
+        ? `/api/search-movie?name=${encodeURIComponent(searchValue)}`
+        : `/api/movie-proxy?id=${encodeURIComponent(searchValue)}`;
+      
+      const response = await fetch(endpoint);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch movie data');
+      }
+      
+      const data = await response.json();
+      setMovieData(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to analyze movie. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
@@ -90,14 +95,49 @@ const analyzeMovie = async () => {
             Movie Audience Insights
           </h1>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Enter an IMDb movie ID to analyze audience sentiment and get deep insights about the film's reception
+            Search by movie name or enter an IMDb ID to analyze audience sentiment and get deep insights about the film's reception
           </p>
+        </div>
+
+        {/* Search Type Toggle */}
+        <div className="flex justify-center mb-6">
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-1 flex gap-1">
+            <button
+              onClick={() => {
+                setSearchType('name');
+                setSearchValue('');
+                setError('');
+              }}
+              className={`px-6 py-2 rounded-md transition-all duration-200 ${
+                searchType === 'name'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              Search by Name
+            </button>
+            <button
+              onClick={() => {
+                setSearchType('id');
+                setSearchValue('');
+                setError('');
+              }}
+              className={`px-6 py-2 rounded-md transition-all duration-200 ${
+                searchType === 'id'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              Search by IMDb ID
+            </button>
+          </div>
         </div>
 
         {/* Search Section */}
         <SearchBar 
-          movieId={movieId}
-          setMovieId={setMovieId}
+          searchType={searchType}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
           onAnalyze={analyzeMovie}
           loading={loading}
         />
