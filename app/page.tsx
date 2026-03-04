@@ -46,6 +46,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+// In app/page.tsx, update the analyzeMovie function
 const analyzeMovie = async () => {
   if (!movieId.trim()) {
     setError('Please enter a movie ID');
@@ -56,8 +57,8 @@ const analyzeMovie = async () => {
   setError('');
   
   try {
-    // Use the full external API URL
-    const response = await fetch(`http://13.62.47.101:3000/api/movie?id=${movieId}`);
+    // Use the proxy instead of direct API call
+    const response = await fetch(`/api/movie-proxy?id=${movieId}`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch movie data');
